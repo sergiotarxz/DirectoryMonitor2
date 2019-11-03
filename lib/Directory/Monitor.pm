@@ -90,20 +90,49 @@ sub Scan {
                     );
                 }
                 else {
-                    $self->_EventActivation(
-                        event           => $ON_UPDATE,
-                        callback_params => [
-                            event        => $ON_UPDATE,
-                            file_name    => "$file",
-                            old_checksum => $self->{db_files}{"$file"},
-                            checksum     => $digest,
-                        ]
-                    ) if $self->{db_files}{"$file"} ne $digest;
+                    if ( !( defined $self->{db_files}{$file} )
+                        || $self->{db_files}{"$file"} ne $digest )
+                    {
+                        $self->_EventActivation(
+                            event           => $ON_UPDATE,
+                            callback_params => [
+                                event        => $ON_UPDATE,
+                                file_name    => "$file",
+                                old_checksum => $self->{db_files}{"$file"},
+                                checksum     => $digest,
+                            ]
+                        );
+                    }
                 }
             }
             $self->{db_files}{"$file"} = $digest;
         }
         elsif ( $file->is_dir ) {
+            if ( !$without_trigger ) {
+            if ( !exists $self->{db_files}{$file} ) {
+                $self->_EventActivation(
+                    event           => $ON_CREATE,
+                    callback_params => [
+                        event        => $ON_CREATE,
+                        file_name    => "$file",
+                        old_checksum => undef,
+                        checksum     => undef,
+                    ]
+                );
+            }
+            if ( defined $self->{db_files}{$file} ) {
+                $self->_EventActivation(
+                    event           => $ON_UPDATE,
+                    callback_params => [
+                        event        => $ON_UPDATE,
+                        file_name    => "$file",
+                        old_checksum => $self->{db_files}{"$file"},
+                        checksum     => undef,
+                    ]
+                );
+            }
+            }
+            $self->{db_files}{$file} = undef;
             $self->Scan(
                 directory       => "$file",
                 without_trigger => $without_trigger,
