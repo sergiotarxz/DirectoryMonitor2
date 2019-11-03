@@ -3,7 +3,7 @@
     "name": "DirectoryMonitor2",
     "author": "Sergio Iglesias",
     "abstract": "A event oriented library to monitor directories.",
-    "license": "perl",
+    "license": "lgpl",
     "prereqs": {
         "runtime": {
             "requires": {
