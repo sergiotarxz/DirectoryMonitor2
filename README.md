@@ -17,7 +17,7 @@ $directory_monitor->AddEventListener(
         my %params = @_;
         my $file   = $params{file_name};
         my $event  = $params{event};
-        say $event=~ s/^on//r . " " . $file;
+        say ucfirst($event=~ s/^on//r) . " " . $file;
     }
 );
 $directory_monitor->StartMonitor;
